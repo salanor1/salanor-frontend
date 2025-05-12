@@ -5,6 +5,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import bootstrap from './main.server';
 
+import { render } from '@netlify/angular-runtime/common-engine'
+
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 const indexHtml = join(serverDistFolder, 'index.server.html');
@@ -28,12 +30,28 @@ const commonEngine = new CommonEngine();
  * Serve static files from /browser
  */
 app.get(
-  '**',
-  express.static(browserDistFolder, {
-    maxAge: '1y',
-    index: 'index.html'
-  }),
+	'**',
+	express.static(browserDistFolder, {
+		maxAge: '1y',
+		index: 'index.html'
+	}),
 );
+
+// Handle all other requests by rendering the Angular application
+app.get('**', (req, res, next) => {
+	const { protocol, originalUrl, baseUrl, headers } = req;
+  
+	commonEngine
+	  .render({
+		bootstrap,  // Bootstrap module for SSR
+		documentFilePath: indexHtml,  // Path to your HTML template
+		url: `${protocol}://${headers.host}${originalUrl}`,  // Full URL for request
+		publicPath: browserDistFolder,  // Path to static assets
+		providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],  // Set base href for routing
+	  })
+	  .then((html) => res.send(html))  // Render the HTML and send to client
+	  .catch((err) => next(err));  // Error handling
+});
 
 /**
  * Handle all other requests by rendering the Angular application.
