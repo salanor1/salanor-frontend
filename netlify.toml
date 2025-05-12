@@ -1,6 +1,11 @@
 [build]
   command = "ng build --configuration production"
   publish = "dist/salanor-frontend/browser"
+  environment = { GO_VERSION = "1.19" }
 
 [functions]
   node_bundler = "esbuild"
+
+[build.environment]
+  GO_VERSION = "1.19"
+  
