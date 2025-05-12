@@ -1,9 +1,9 @@
 [build]
   command = "ng build --configuration production"
-  publish = "dist/<your-project-name>"
+  publish = "dist/salanor-frontend
 
 [functions]
   node_bundler = "esbuild"
 
 [plugins]
-  package = "@netlify/plugin-angular" # Not @netlify/angular-runtime
+  package = "@netlify/plugin-angular"
