@@ -1,11 +1,9 @@
 [build]
   command = "ng build --configuration production"
   publish = "dist/salanor-frontend/browser"
-  environment = { GO_VERSION = "1.19" }
 
-[functions]
-  node_bundler = "esbuild"
+[context.production.environment]
+  NODE_ENV = "production"
 
-[build.environment]
-  GO_VERSION = "1.19"
-  
+[[plugins]]
+  package = "@netlify/angular-runtime"
